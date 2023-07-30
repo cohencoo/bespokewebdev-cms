@@ -6,12 +6,13 @@ const cms = {
     count: 1,
     elements: document.body.getElementsByTagName("*"),
     textNode: (element) => {
-        if (!element || !element.hasChildNodes()) return false
-        for (const node of element.childNodes) {
-            if (node.nodeType === Node.ELEMENT_NODE && node.tagName.toLowerCase() !== "br")
-                return false
+        for (let i = 0; i < element.childNodes.length; i++) {
+            let child = element.childNodes[i]
+            if (child.nodeType === Node.TEXT_NODE && /\S/.test(child.nodeValue)) {
+                return true
+            }
         }
-        return true
+        return false
     },
     update: () => {
         Object.keys(cms.instructions).forEach((key) => {
