@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import "./Management.css"
 import { Credentials } from "../App"
 
@@ -8,24 +8,21 @@ interface ManagementInterface {
 }
 
 const Management: React.FC<ManagementInterface> = ({ credentials, setCredentials }) => {
+    const [loaded, setLoaded] = useState(false)
+
+    const handleIFrameLoad = () => {
+        setLoaded(true)
+    }
+
     return (
         <div className="Management">
             <div className="header">
                 <h1>
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="22"
-                        height="22"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="2" y1="12" x2="22" y2="12"></line>
-                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-                    </svg>
+                    <span
+                        style={{ fontWeight: "300", fontSize: "2rem" }}
+                        className="material-symbols-rounded">
+                        domain
+                    </span>
                     Managing {credentials?.domain}
                 </h1>
                 <a
@@ -34,14 +31,27 @@ const Management: React.FC<ManagementInterface> = ({ credentials, setCredentials
                     target="_blank"
                     rel="noreferrer">
                     Visit Site
+                    <span className="material-symbols-rounded">arrow_right_alt</span>
                 </a>
             </div>
 
             <div style={{ height: "100%" }}>
-                <div className="notice">You are in Edit Mode - Edit text by clicking on it.</div>
+                <div className="notice">
+                    <span className="material-symbols-rounded">info</span>
+                    You are in Edit Mode - Edit text by clicking on it.
+                </div>
+
+                {!loaded && (
+                    <div className="iframe-loader">
+                        <div className="loader"></div>
+                        <span>Loading Resources...</span>
+                    </div>
+                )}
                 <iframe
+                    onLoad={handleIFrameLoad}
+                    style={{ display: loaded ? "block" : "none" }}
                     title="management"
-                    src={`http://localhost:5500/website/index.html?q=${credentials?.domain}&token=${credentials?.password}`}></iframe>
+                    src={`//${credentials?.domain}?q=${credentials?.domain}&token=${credentials?.password}`}></iframe>
             </div>
         </div>
     )

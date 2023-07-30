@@ -1,7 +1,10 @@
-import React from "react"
+// @ts-nocheck
+import React, { useState } from "react"
 import "./Login.css"
-import logo from "./rounded.png"
-import { API_ROUTE, Credentials } from "../App"
+import logo from "../assets/rounded.png"
+import { API_ROUTE, Credentials, toastSchema } from "../App"
+import Button from "../Button/Button"
+import { toast } from "react-hot-toast"
 
 interface LoginInterface {
     credentials: Credentials | undefined
@@ -9,35 +12,44 @@ interface LoginInterface {
 }
 
 const Login: React.FC<LoginInterface> = ({ credentials, setCredentials }) => {
+    const [verifying, setVerifying] = useState(false)
     async function authenticate(domain: string, password: string) {
+        setVerifying(true)
         try {
             const response = await fetch(`${API_ROUTE}/auth-domain`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    domain: domain,
-                    password: password,
-                }),
+                body: JSON.stringify({ domain: domain, password: password }),
             })
 
             if (!response.ok) {
-                if (response.status === 404) {
-                    alert(`Bespoke Web Dev CMS is not set up for ${domain}`)
-                } else if (response.status === 400) {
-                    alert("Please enter your login details")
-                } else {
-                    alert("We weren't able to log you in. Please contact us.")
-                }
+                setVerifying(false)
+                if (response.status === 404)
+                    toast.error(
+                        `It looks like Bespoke Web Dev CMS hasn't been setup for ${domain}. Please reach out to us.`,
+                        toastSchema("not-found")
+                    )
+                else if (response.status === 400)
+                    toast.error("Please enter your login details", toastSchema("no-credentials"))
+                else
+                    toast.error(
+                        "Something went wrong, and we couldn't log you in. Please reach out to us.",
+                        toastSchema("login-failed")
+                    )
                 return
             }
 
+            setVerifying(false)
             setCredentials({
                 ...credentials,
                 authenticated: true,
             })
         } catch (error) {
-            alert("An error occurred. Please try again later.")
-            console.error(error)
+            setVerifying(false)
+            toast.error(
+                "Something went wrong, and we couldn't log you in. Please reach out to us.",
+                toastSchema("login-failed-1")
+            )
         }
     }
     return (
@@ -55,39 +67,44 @@ const Login: React.FC<LoginInterface> = ({ credentials, setCredentials }) => {
                     Hello! Let's get you signed in, so you can start editing your website in no
                     time.
                 </p>
-                <label htmlFor="website">Your Web Domain</label>
+                <label htmlFor="website">
+                    <span className="material-symbols-rounded">domain</span>
+                    Your Web Domain
+                </label>
                 <input
                     onChange={(e: any) => {
                         const domain = e.target.value.replace(/(^\w+:|^)\/\//, "")
-                        setCredentials({
-                            ...credentials,
-                            domain,
-                        })
+                        setCredentials({ ...credentials, domain })
                     }}
                     type="text"
                     placeholder="example.com"
                     name="website"
                 />
-                <label htmlFor="token">Client No.</label>
+                <label htmlFor="token">
+                    <span className="material-symbols-rounded">account_circle</span>
+                    Client No.
+                </label>
                 <input
-                    onChange={(e: any) => {
-                        setCredentials({
-                            ...credentials,
-                            password: e.target.value,
-                        })
-                    }}
+                    onChange={(e: any) =>
+                        setCredentials({ ...credentials, password: e.target.value })
+                    }
                     type="text"
                     placeholder="4 digit pin"
                     name="token"
                 />
-                <button onClick={() => authenticate(credentials?.domain!, credentials?.password!)}>
-                    Login
-                </button>
+
+                <Button
+                    message={["Login", "Verifying..."]}
+                    icon="login"
+                    verifying={verifying}
+                    action={() => authenticate(credentials?.domain!, credentials?.password!)}
+                />
 
                 <p className="text">
+                    <span className="material-symbols-rounded">info</span>
                     Sign in from your computer to make the most of your editing experience.
                 </p>
-                <a target="_blank" href="//bespokewebdev.com" rel="noreferrer">
+                <a target="_blank" href="https://bespokewebdev.com" rel="noreferrer">
                     bespokewebdev.com
                 </a>
             </div>

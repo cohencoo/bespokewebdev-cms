@@ -1,0 +1,49 @@
+.Button {
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 500;
+    background-color: #0066ff;
+    border: 0;
+    border-radius: 5px;
+    padding: 10px 20px;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    width: 100%;
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    transition: 0.3s;
+}
+
+.Button .verifying {
+    display: flex;
+    align-items: center;
+    color: #ffcc00;
+}
+
+.Button .verifying .loader {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-right: 1rem;
+    border: 3px solid #ffcc00;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.Button:hover {
+    filter: brightness(0.8);
+}

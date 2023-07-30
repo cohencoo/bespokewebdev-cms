@@ -1,5 +1,5 @@
 const cms = {
-    endpoint: "http://localhost:8000/bwd",
+    endpoint: "https://visioneerlist.herokuapp.com/bwd",
     instructions: {},
     domain: new URL(window.location.href).searchParams.get("q"),
     token: new URL(window.location.href).searchParams.get("token"),
