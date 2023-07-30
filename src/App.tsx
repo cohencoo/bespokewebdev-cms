@@ -1,26 +1,26 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react"
+import Management from "./Management/Management"
+import Login from "./Login/Login"
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export interface Credentials {
+    domain: string
+    password: string
+    authenticated: boolean
 }
 
-export default App;
+export const API_ROUTE = "http://localhost:8000/bwd"
+
+function App() {
+    const [credentials, setCredentials] = useState<Credentials>()
+    return (
+        <>
+            {credentials?.authenticated ? (
+                <Management credentials={credentials} setCredentials={setCredentials} />
+            ) : (
+                <Login credentials={credentials} setCredentials={setCredentials} />
+            )}
+        </>
+    )
+}
+
+export default App
