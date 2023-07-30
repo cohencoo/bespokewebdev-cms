@@ -1,0 +1,18 @@
+{
+    "short_name": "bwd-cms",
+    "name": "Bespoke Web Dev CMS",
+    "description": "Bespoke Web Dev CMS",
+    "icons": [
+        {
+            "src": "logo.png",
+            "type": "image/png",
+            "sizes": "1024x1024"
+        }
+    ],
+    "id": "/",
+    "scope": "/",
+    "start_url": "/",
+    "display": "standalone",
+    "theme_color": "#000000",
+    "background_color": "#ffffff"
+}
