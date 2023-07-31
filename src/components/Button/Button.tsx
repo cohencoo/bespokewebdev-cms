@@ -1,5 +1,5 @@
 import React from "react"
-import "./Button.css"
+import styles from "./Button.module.scss"
 
 interface ButtonProps {
     message: string[]
@@ -12,12 +12,12 @@ const Button: React.FC<ButtonProps> = ({ message, icon, verifying, action }) => 
     const [defaultText, activeText] = message
     return (
         <button
-            className="Button"
+            className={styles.Button}
             onClick={() => (!verifying ? action() : null)}
             style={{ background: verifying ? "#99601010" : undefined }}>
             {verifying ? (
-                <div className="verifying">
-                    <div className="loader"></div>
+                <div className={styles.verifying}>
+                    <div className={styles.loader}></div>
                     {activeText}
                 </div>
             ) : (

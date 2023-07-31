@@ -1,6 +1,6 @@
 import React, { useState } from "react"
-import Management from "./Management/Management"
-import Login from "./Login/Login"
+import Management from "./components/Management/Management"
+import Login from "./components/Login/Login"
 import { Toaster } from "react-hot-toast"
 
 export const API_ROUTE = "https://visioneerlist.herokuapp.com/bwd"

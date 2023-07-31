@@ -1,0 +1,26 @@
+.SegmentedInput {
+    margin: 1rem 0;
+    display: flex;
+    gap: 10px;
+
+    input {
+        opacity: 0;
+        position: absolute;
+        z-index: -1;
+    }
+
+    .segment {
+        font-size: 2rem;
+        height: 60px;
+        width: 45px;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        border: 1px solid #333;
+        text-align: center;
+        transition: 0.15s;
+
+        &:active {
+            background-color: #333;
+        }
+    }
+}

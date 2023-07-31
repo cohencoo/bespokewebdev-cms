@@ -4,8 +4,8 @@
     "description": "Bespoke Web Dev CMS",
     "icons": [
         {
-            "src": "logo.png",
-            "type": "image/png",
+            "src": "logo.svg",
+            "type": "image/svg+xml",
             "sizes": "1024x1024"
         }
     ],

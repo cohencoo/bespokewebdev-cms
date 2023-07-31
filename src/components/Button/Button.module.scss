@@ -1,0 +1,49 @@
+.Button {
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 500;
+    background-color: var(--blue);
+    border: 0;
+    border-radius: 5px;
+    padding: 10px 20px;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    width: 100%;
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    transition: 0.3s;
+
+    .verifying {
+        display: flex;
+        align-items: center;
+        color: var(--theme);
+
+        .loader {
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-right: 1rem;
+            border: 3px solid var(--theme);
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+    }
+
+    &:hover {
+        filter: brightness(0.8);
+    }
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

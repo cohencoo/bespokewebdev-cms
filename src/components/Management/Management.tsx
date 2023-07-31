@@ -1,6 +1,6 @@
 import React, { useState } from "react"
-import "./Management.css"
-import { Credentials } from "../App"
+import styles from "./Management.module.scss"
+import { Credentials } from "../../App"
 
 interface ManagementInterface {
     credentials: Credentials | undefined
@@ -15,8 +15,8 @@ const Management: React.FC<ManagementInterface> = ({ credentials, setCredentials
     }
 
     return (
-        <div className="Management">
-            <div className="header">
+        <div className={styles.Management}>
+            <div className={styles.header}>
                 <h1>
                     <span
                         style={{ fontWeight: "300", fontSize: "2rem" }}
@@ -26,7 +26,7 @@ const Management: React.FC<ManagementInterface> = ({ credentials, setCredentials
                     Managing {credentials?.domain}
                 </h1>
                 <a
-                    className="button"
+                    className={styles.button}
                     href={"//" + credentials?.domain}
                     target="_blank"
                     rel="noreferrer">
@@ -36,14 +36,14 @@ const Management: React.FC<ManagementInterface> = ({ credentials, setCredentials
             </div>
 
             <div style={{ height: "100%" }}>
-                <div className="notice">
+                <div className={styles.notice}>
                     <span className="material-symbols-rounded">info</span>
                     You are in Edit Mode - Edit text by clicking on it.
                 </div>
 
                 {!loaded && (
-                    <div className="iframe-loader">
-                        <div className="loader"></div>
+                    <div className={styles.iframeLoader}>
+                        <div className={styles.loader}></div>
                         <span>Loading Resources...</span>
                     </div>
                 )}

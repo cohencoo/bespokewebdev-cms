@@ -1,5 +1,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap");
 
+:root {
+    --theme: #ffb300;
+    --blue: #0066ff;
+    --subtext: #ccc;
+}
+
 * {
     box-sizing: border-box;
     scroll-behavior: smooth;
@@ -9,9 +15,17 @@ body {
     margin: 0;
     padding: 0;
     font-size: 16px;
+    background-color: black;
     font-family: "Montserrat", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background: #333;
+    margin: 1.2rem 0;
 }
 
 @font-face {

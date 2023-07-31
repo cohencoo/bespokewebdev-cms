@@ -1,10 +1,11 @@
-// @ts-nocheck
 import React, { useState } from "react"
-import "./Login.css"
-import logo from "../assets/rounded.png"
-import { API_ROUTE, Credentials, toastSchema } from "../App"
+import styles from "./Login.module.scss"
+import logo from "../../assets/logo.svg"
+import { API_ROUTE, Credentials, toastSchema } from "../../App"
 import Button from "../Button/Button"
 import { toast } from "react-hot-toast"
+import cn from "clsx"
+import SegmentedInput from "../SegmentedInput/SegmentedInput"
 
 interface LoginInterface {
     credentials: Credentials | undefined
@@ -53,44 +54,44 @@ const Login: React.FC<LoginInterface> = ({ credentials, setCredentials }) => {
         }
     }
     return (
-        <div className="Login">
-            <div className="container">
-                <div className="flex">
-                    <img src={logo} className="logo" alt="BWD" />
+        <div className={styles.Login}>
+            <div className={styles.container}>
+                <div className={styles.flex}>
+                    <img src={logo} className={styles.logo} alt="BWD" />
                     <div>
                         <h1>Bespoke Web Dev</h1>
                         <h3>Content Management</h3>
                     </div>
                 </div>
 
-                <p className="text">
+                <p className={styles.text}>
                     Hello! Let's get you signed in, so you can start editing your website in no
                     time.
                 </p>
-                <label htmlFor="website">
+
+                <label htmlFor="domain">
                     <span className="material-symbols-rounded">domain</span>
                     Your Web Domain
                 </label>
+
                 <input
                     onChange={(e: any) => {
                         const domain = e.target.value.replace(/(^\w+:|^)\/\//, "")
                         setCredentials({ ...credentials, domain })
                     }}
-                    type="text"
+                    type="domain"
+                    name="domain"
                     placeholder="example.com"
-                    name="website"
                 />
-                <label htmlFor="token">
+
+                <label>
                     <span className="material-symbols-rounded">account_circle</span>
-                    Client No.
+                    Client Pin (4-digits)
                 </label>
-                <input
-                    onChange={(e: any) =>
-                        setCredentials({ ...credentials, password: e.target.value })
-                    }
-                    type="text"
-                    placeholder="4 digit pin"
-                    name="token"
+
+                <SegmentedInput
+                    maxLength={4}
+                    onChange={(value: any) => setCredentials({ ...credentials, password: value })}
                 />
 
                 <Button
@@ -100,13 +101,12 @@ const Login: React.FC<LoginInterface> = ({ credentials, setCredentials }) => {
                     action={() => authenticate(credentials?.domain!, credentials?.password!)}
                 />
 
-                <p className="text">
+                <hr />
+
+                <p className={cn([styles.text, styles.notice])}>
                     <span className="material-symbols-rounded">info</span>
                     Sign in from your computer to make the most of your editing experience.
                 </p>
-                <a target="_blank" href="https://bespokewebdev.com" rel="noreferrer">
-                    bespokewebdev.com
-                </a>
             </div>
         </div>
     )
