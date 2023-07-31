@@ -1,7 +1,8 @@
+/* eslint-disable no-restricted-globals */
 const cms = {
     endpoint: "https://visioneerlist.herokuapp.com/bwd",
     instructions: {},
-    domain: new URL(window.location.href).searchParams.get("q"),
+    domain: location.hostname,
     token: new URL(window.location.href).searchParams.get("token"),
     count: 1,
     elements: document.body.getElementsByTagName("*"),
@@ -33,8 +34,7 @@ for (let i = 0; i < cms.elements.length; i++) {
     }
 }
 
-// eslint-disable-next-line no-restricted-globals
-fetch(`${cms.endpoint}/get-domain/${location.hostname}`)
+fetch(`${cms.endpoint}/get-domain/${cms.domain}`)
     .then((response) => response.json())
     .then((data) => {
         cms.instructions = data
@@ -83,12 +83,7 @@ if (cms.domain && cms.token) {
                     modifications: instructions,
                 }),
             })
-
-            if (!response.ok) {
-                throw new Error("Failed to update domain.")
-            }
-
-            console.log("Saved!")
+            if (!response.ok) throw new Error("Failed to update domain.")
         } catch (error) {
             alert("An error occurred. Please try again later.")
             console.error(error)
@@ -113,11 +108,12 @@ if (cms.domain && cms.token) {
         const response = await authenticate(cms.domain, cms.token)
         if (response && cms.token === response.password) {
             document.querySelectorAll("[cms-id]").forEach((element) => {
-                element.style.border = "1px dotted red"
+                element.style.border = "0.5px dotted red"
                 element.style.borderRadius = "3px"
 
                 element.addEventListener("click", (e) => {
                     e.preventDefault()
+                    e.stopPropagation()
                     handleElementClick(element, cms)
                 })
             })
