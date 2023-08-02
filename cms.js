@@ -24,9 +24,10 @@ const cms = {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
             })
-            if (!response.ok) throw new Error("Request failed.")
+            if (!response.ok) throw new Error(`Request failed with status ${response.status}.`)
             return response.json()
         } catch (error) {
+            alert("An error occurred. Please try again later.")
             console.error(error)
             return null
         }
