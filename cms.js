@@ -2,7 +2,10 @@
 const cms = {
     endpoint: "https://visioneerlist.herokuapp.com/bwd",
     modifications: {},
+    origin: location.hostname,
+    path: location.pathname,
     token: new URL(window.location.href).searchParams.get("token"),
+    count: 1,
     elements: document.body.getElementsByTagName("*"),
     textNode: (element) => {
         for (let i = 0; i < element.childNodes.length; i++) {
@@ -24,10 +27,9 @@ const cms = {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
             })
-            if (!response.ok) throw new Error(`Request failed with status ${response.status}.`)
+            if (!response.ok) throw new Error("Request failed.")
             return response.json()
         } catch (error) {
-            alert("An error occurred. Please try again later.")
             console.error(error)
             return null
         }
