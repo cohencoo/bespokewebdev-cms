@@ -2,7 +2,8 @@
 const cms = {
     endpoint: "https://visioneerlist.herokuapp.com/bwd",
     instructions: {},
-    domain: location.hostname,
+    origin: location.hostname,
+    path: location.pathname,
     token: new URL(window.location.href).searchParams.get("token"),
     count: 1,
     elements: document.body.getElementsByTagName("*"),
@@ -34,14 +35,21 @@ for (let i = 0; i < cms.elements.length; i++) {
     }
 }
 
-fetch(`${cms.endpoint}/get-domain/${cms.domain}`)
+fetch(`${cms.endpoint}/get-domain`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+        origin: cms.origin,
+        path: cms.path,
+    }),
+})
     .then((response) => response.json())
     .then((data) => {
         cms.instructions = data
         cms.update()
     })
 
-if (cms.domain && cms.token) {
+if (cms.origin && cms.token) {
     async function authenticate(domain, password) {
         try {
             const response = await fetch(`${cms.endpoint}/auth-domain`, {
@@ -78,8 +86,9 @@ if (cms.domain && cms.token) {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    domain: domain,
+                    origin: domain,
                     password: password,
+                    path: cms.path,
                     modifications: instructions,
                 }),
             })
@@ -99,13 +108,13 @@ if (cms.domain && cms.token) {
 
         if (text) {
             cms.instructions[id] = text
-            await updateDomain(cms.domain, cms.token, cms.instructions)
+            await updateDomain(cms.origin, cms.token, cms.instructions)
             cms.update()
         }
     }
 
     ;(async () => {
-        const response = await authenticate(cms.domain, cms.token)
+        const response = await authenticate(cms.origin, cms.token)
         if (response && cms.token === response.password) {
             document.querySelectorAll("[cms-id]").forEach((element) => {
                 element.style.border = "0.5px dotted red"
