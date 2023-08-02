@@ -39,7 +39,7 @@ fetch(`${cms.endpoint}/get-domain`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-        origin: cms.origin,
+        domain: cms.origin,
         path: cms.path,
     }),
 })
@@ -48,6 +48,7 @@ fetch(`${cms.endpoint}/get-domain`, {
         cms.instructions = data
         cms.update()
     })
+    .catch((error) => {})
 
 if (cms.origin && cms.token) {
     async function authenticate(domain, password) {
@@ -86,8 +87,8 @@ if (cms.origin && cms.token) {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    origin: domain,
-                    password: password,
+                    domain,
+                    password,
                     path: cms.path,
                     modifications: instructions,
                 }),
