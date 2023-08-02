@@ -91,10 +91,13 @@ const Login: React.FC<LoginInterface> = ({ credentials, setCredentials }) => {
 
                 <SegmentedInput
                     maxLength={4}
+                    secret={true}
                     onChange={(value: any) => setCredentials({ ...credentials, password: value })}
+                    onFilled={() => document.getElementById("signIn")?.click()}
                 />
 
                 <Button
+                    id={"signIn"}
                     message={["Login", "Verifying..."]}
                     icon="login"
                     verifying={verifying}

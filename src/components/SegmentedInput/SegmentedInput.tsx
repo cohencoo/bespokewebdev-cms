@@ -1,17 +1,40 @@
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import styles from "./SegmentedInput.module.scss"
 
 interface SegmentedInputInterface {
     onChange: any
     maxLength?: number
+    secret?: boolean
+    onFilled?: any
 }
 
-const SegmentedInput: React.FC<SegmentedInputInterface> = ({ onChange, maxLength }) => {
+const SegmentedInput: React.FC<SegmentedInputInterface> = ({
+    onChange,
+    maxLength,
+    secret,
+    onFilled,
+}) => {
     const [input, setInput] = useState("")
     const inputRef = useRef<HTMLInputElement>(null)
+    const [highlightFirst, setHighlightFirst] = useState(false)
+
+    useEffect(() => {
+        if (input.length === maxLength && onFilled) {
+            onFilled()
+            setInput("")
+            if (inputRef.current) {
+                inputRef.current.focus()
+                inputRef.current.value = ""
+            }
+        }
+    }, [input, maxLength, onFilled])
+
     return (
         <div
-            onClick={() => inputRef.current && inputRef.current.focus()}
+            onClick={() => {
+                inputRef.current && inputRef.current.focus()
+                setHighlightFirst(true)
+            }}
             className={styles.SegmentedInput}>
             <input
                 type="text"
@@ -30,10 +53,12 @@ const SegmentedInput: React.FC<SegmentedInputInterface> = ({ onChange, maxLength
                         key={i}
                         className={styles.segment}
                         style={{
-                            backgroundColor:
-                                i < input.length ? "rgba(255, 255, 255, 0.08)" : undefined,
+                            background:
+                                (highlightFirst && i === 0) || i < input.length
+                                    ? "rgba(255, 255, 255, 0.08)"
+                                    : undefined,
                         }}>
-                        {input[i]}
+                        {secret && input[i] ? "•" : input[i]}
                     </div>
                 ))}
         </div>

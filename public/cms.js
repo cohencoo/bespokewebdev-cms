@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 const cms = {
     endpoint: "https://visioneerlist.herokuapp.com/bwd",
-    instructions: {},
+    modifications: {},
     origin: location.hostname,
     path: location.pathname,
     token: new URL(window.location.href).searchParams.get("token"),
@@ -10,20 +10,69 @@ const cms = {
     textNode: (element) => {
         for (let i = 0; i < element.childNodes.length; i++) {
             let child = element.childNodes[i]
-            if (child.nodeType === Node.TEXT_NODE && /\S/.test(child.nodeValue)) {
-                return true
-            }
+            if (child.nodeType === Node.TEXT_NODE && /\S/.test(child.nodeValue)) return true
         }
         return false
     },
+    handleElementClick: async (element) => {
+        const id = element.getAttribute("cms-id")
+        const text = prompt(
+            "Editing this text",
+            document.querySelector(`[cms-id="${id}"]`).innerText
+        )
+
+        if (text) {
+            cms.modifications[id] = text
+            await cms.updateDomain(cms.modifications)
+            cms.update()
+        }
+    },
     update: () => {
-        Object.keys(cms.instructions).forEach((key) => {
-            const [selector, replacement] = [
-                document.querySelector(`[cms-id="${key}"]`),
-                cms.instructions[key],
-            ]
-            if (selector) selector.innerHTML = replacement
+        Object.keys(cms.modifications).forEach((key) => {
+            const selector = document.querySelector(`[cms-id="${key}"]`)
+            if (selector) selector.innerHTML = cms.modifications[key]
         })
+    },
+    fetch: async (url, data) => {
+        try {
+            const response = await fetch(cms.endpoint + url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            })
+            if (!response.ok) throw new Error("Request failed.")
+            return response.json()
+        } catch (error) {
+            console.error(error)
+            return null
+        }
+    },
+    getDomain: async () => {
+        try {
+            const response = await cms.fetch("/get-domain", {
+                domain: cms.origin,
+                path: cms.path,
+            })
+            if (!response) throw new Error("Failed to get domain.")
+            return response
+        } catch (error) {
+            console.error(error)
+            return null
+        }
+    },
+    updateDomain: async (modifications) => {
+        try {
+            const response = await cms.fetch("/update-domain", {
+                domain: cms.origin,
+                password: cms.token,
+                path: cms.path,
+                modifications: modifications,
+            })
+            if (!response) throw new Error("Failed to update domain.")
+            return response
+        } catch (error) {
+            console.error(error)
+        }
     },
 }
 
@@ -35,86 +84,18 @@ for (let i = 0; i < cms.elements.length; i++) {
     }
 }
 
-fetch(`${cms.endpoint}/get-domain`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-        origin: cms.origin,
-        path: cms.path,
-    }),
-})
-    .then((response) => response.json())
-    .then((data) => {
-        cms.instructions = data
+;(async () => {
+    const data = await cms.getDomain()
+    if (data) {
+        cms.modifications = data
         cms.update()
-    })
-
-if (cms.origin && cms.token) {
-    async function authenticate(domain, password) {
-        try {
-            const response = await fetch(`${cms.endpoint}/auth-domain`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    domain: domain,
-                    password: password,
-                }),
-            })
-
-            if (!response.ok) {
-                if (response.status === 404) {
-                    alert("This domain has not been registered for Bespoke Web Dev CMS")
-                } else if (response.status === 400) {
-                    alert("Missing required fields")
-                } else {
-                    alert("An error occurred. Please try again later.")
-                }
-                return null
-            }
-
-            return response.json()
-        } catch (error) {
-            alert("An error occurred. Please try again later.")
-            console.error(error)
-            return null
-        }
     }
 
-    async function updateDomain(domain, password, instructions) {
-        try {
-            const response = await fetch(`${cms.endpoint}/update-domain`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    origin: domain,
-                    password: password,
-                    path: cms.path,
-                    modifications: instructions,
-                }),
-            })
-            if (!response.ok) throw new Error("Failed to update domain.")
-        } catch (error) {
-            alert("An error occurred. Please try again later.")
-            console.error(error)
-        }
-    }
-
-    async function handleElementClick(element, cms) {
-        const id = element.getAttribute("cms-id")
-        const text = prompt(
-            "Editing this text",
-            document.querySelector(`[cms-id="${id}"]`).innerText
-        )
-
-        if (text) {
-            cms.instructions[id] = text
-            await updateDomain(cms.origin, cms.token, cms.instructions)
-            cms.update()
-        }
-    }
-
-    ;(async () => {
-        const response = await authenticate(cms.origin, cms.token)
+    if (cms.origin && cms.token) {
+        const response = await cms.fetch("/auth-domain", {
+            domain: cms.origin,
+            password: cms.token,
+        })
         if (response && cms.token === response.password) {
             document.querySelectorAll("[cms-id]").forEach((element) => {
                 element.style.border = "0.5px dotted red"
@@ -123,9 +104,9 @@ if (cms.origin && cms.token) {
                 element.addEventListener("click", (e) => {
                     e.preventDefault()
                     e.stopPropagation()
-                    handleElementClick(element, cms)
+                    cms.handleElementClick(element)
                 })
             })
         }
-    })()
-}
+    }
+})()

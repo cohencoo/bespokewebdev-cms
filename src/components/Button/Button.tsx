@@ -4,15 +4,17 @@ import styles from "./Button.module.scss"
 interface ButtonProps {
     message: string[]
     verifying: boolean
-    icon: any
+    icon: string
+    id?: string
     action: () => void
 }
 
-const Button: React.FC<ButtonProps> = ({ message, icon, verifying, action }) => {
+const Button: React.FC<ButtonProps> = ({ message, icon, verifying, id, action }) => {
     const [defaultText, activeText] = message
     return (
         <button
             className={styles.Button}
+            id={id}
             onClick={() => (!verifying ? action() : null)}
             style={{ background: verifying ? "#99601010" : undefined }}>
             {verifying ? (
