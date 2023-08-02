@@ -14,15 +14,28 @@ const cms = {
         }
         return false
     },
+    handleElementClick: async (element) => {
+        const id = element.getAttribute("cms-id")
+        const text = prompt(
+            "Editing this text",
+            document.querySelector(`[cms-id="${id}"]`).innerText
+        )
+
+        if (text) {
+            cms.modifications[id] = text
+            await cms.updateDomain(cms.modifications)
+            cms.update()
+        }
+    },
     update: () => {
         Object.keys(cms.modifications).forEach((key) => {
             const selector = document.querySelector(`[cms-id="${key}"]`)
             if (selector) selector.innerHTML = cms.modifications[key]
         })
     },
-    fetchWithAuth: async (url, data) => {
+    fetch: async (url, data) => {
         try {
-            const response = await fetch(url, {
+            const response = await fetch(cms.endpoint + url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
@@ -36,7 +49,7 @@ const cms = {
     },
     getDomain: async () => {
         try {
-            const response = await cms.fetchWithAuth(`${cms.endpoint}/get-domain`, {
+            const response = await cms.fetch("/get-domain", {
                 domain: cms.origin,
                 path: cms.path,
             })
@@ -49,7 +62,7 @@ const cms = {
     },
     updateDomain: async (modifications) => {
         try {
-            const response = await cms.fetchWithAuth(`${cms.endpoint}/update-domain`, {
+            const response = await cms.fetch("/update-domain", {
                 domain: cms.origin,
                 password: cms.token,
                 path: cms.path,
@@ -72,30 +85,14 @@ for (let i = 0; i < cms.elements.length; i++) {
 }
 
 ;(async () => {
-    const response = await cms.getDomain()
-    if (response) {
-        cms.modifications = response
+    const data = await cms.getDomain()
+    if (data) {
+        cms.modifications = data
         cms.update()
     }
-})()
 
-if (cms.origin && cms.token) {
-    async function handleElementClick(element) {
-        const id = element.getAttribute("cms-id")
-        const text = prompt(
-            "Editing this text",
-            document.querySelector(`[cms-id="${id}"]`).innerText
-        )
-
-        if (text) {
-            cms.modifications[id] = text
-            await cms.updateDomain(cms.modifications)
-            cms.update()
-        }
-    }
-
-    ;(async () => {
-        const response = await cms.fetchWithAuth(`${cms.endpoint}/auth-domain`, {
+    if (cms.origin && cms.token) {
+        const response = await cms.fetch("/auth-domain", {
             domain: cms.origin,
             password: cms.token,
         })
@@ -107,9 +104,9 @@ if (cms.origin && cms.token) {
                 element.addEventListener("click", (e) => {
                     e.preventDefault()
                     e.stopPropagation()
-                    handleElementClick(element)
+                    cms.handleElementClick(element)
                 })
             })
         }
-    })()
-}
+    }
+})()
