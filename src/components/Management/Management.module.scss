@@ -18,10 +18,17 @@
         justify-content: space-between;
         align-items: center;
         padding: 1rem 0;
+        user-select: none;
 
         @media screen and (max-width: 425px) {
             & {
                 padding: 10px 10px 1rem 10px;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            & {
+                justify-content: center;
             }
         }
 
@@ -34,16 +41,19 @@
             gap: 1rem;
             text-decoration: none;
             color: white;
-            border-bottom: 2px solid transparent;
 
-            &:hover {
-                color: var(--theme);
-                border-bottom: 2px solid var(--theme);
+            .title {
+                border-bottom: 2px solid transparent;
+
+                &:hover {
+                    color: var(--theme);
+                    border-bottom: 2px solid var(--theme);
+                }
             }
 
-            @media screen and (max-width: 425px) {
+            @media screen and (max-width: 768px) {
                 & {
-                    font-size: 1rem;
+                    display: none;
                 }
             }
         }
@@ -62,6 +72,9 @@
             }
 
             select {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
                 font-family: inherit;
                 font-size: 0.9rem;
                 text-decoration: none;
@@ -69,7 +82,7 @@
                 background: rgba(88, 88, 88, 0.5);
                 border: 0;
                 border-radius: 5px;
-                padding: 4px;
+                padding: 4px 2rem 4px 4px;
                 color: white;
                 font-weight: 500;
                 cursor: pointer;
@@ -77,6 +90,10 @@
                 display: flex;
                 align-items: center;
                 gap: 10px;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 1 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: right 0.5rem top 50%;
+                background-size: 1rem auto;
             }
         }
 
@@ -100,9 +117,14 @@
                 display: flex;
                 align-items: center;
                 gap: 10px;
+                transition: 0.2s;
+
+                &:hover {
+                    filter: brightness(0.85);
+                }
             }
 
-            @media screen and (max-width: 820px) {
+            @media screen and (max-width: 1168px) {
                 & {
                     display: none;
                 }
@@ -201,6 +223,19 @@
     gap: 1rem;
     padding-top: 1rem;
 
+    @media screen and (max-width: 768px) {
+        & {
+            flex-direction: column;
+        }
+    }
+
+    ul {
+        li {
+            margin-bottom: 2rem;
+            line-height: 1.4;
+        }
+    }
+
     .modalInput {
         font-family: inherit;
         font-size: 1rem;
@@ -219,6 +254,7 @@
         font-family: inherit;
         font-size: 1rem;
         text-decoration: none;
+        text-align: center;
         font-weight: 500;
         background: var(--theme);
         border: 0;
@@ -229,6 +265,7 @@
         cursor: pointer;
         display: flex;
         align-items: center;
+        justify-content: center;
         gap: 10px;
     }
 }

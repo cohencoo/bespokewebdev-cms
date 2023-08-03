@@ -1,11 +1,12 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import styles from "./Login.module.scss"
 import logo from "../../assets/logo.svg"
-import { API_ROUTE, Credentials, toastSchema } from "../../App"
+import { API_ROUTE, Credentials } from "../../App"
 import Button from "../Button/Button"
 import { toast } from "react-hot-toast"
 import cn from "clsx"
 import SegmentedInput from "../SegmentedInput/SegmentedInput"
+import { API, toastID } from "../../assets/utils"
 
 interface LoginInterface {
     credentials: Credentials | undefined
@@ -14,45 +15,79 @@ interface LoginInterface {
 
 const Login: React.FC<LoginInterface> = ({ credentials, setCredentials }) => {
     const [verifying, setVerifying] = useState(false)
-    async function authenticate(domain: string, password: string) {
-        setVerifying(true)
-        try {
-            const response = await fetch(`${API_ROUTE}/auth-domain`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ domain: domain, password: password }),
-            })
+    const [attempts, setAttempts] = useState(0)
 
-            if (!response.ok) {
-                setVerifying(false)
-                if (response.status === 404)
-                    toast.error(
-                        `It looks like Bespoke Web Dev CMS hasn't been setup for ${domain}. Please reach out to us.`,
-                        toastSchema("not-found")
-                    )
-                else if (response.status === 400)
-                    toast.error("Please enter your login details", toastSchema("no-credentials"))
-                else
-                    toast.error(
-                        "Something went wrong, and we couldn't log you in. Please reach out to us.",
-                        toastSchema("login-failed")
-                    )
-                return
-            }
+    useEffect(() => {
+        const intervalId = setInterval(() => setAttempts(0), 60000)
+        return () => clearInterval(intervalId)
+    }, [])
 
-            setVerifying(false)
-            setCredentials({
-                ...credentials,
-                authenticated: true,
-            })
-        } catch (error) {
-            setVerifying(false)
-            toast.error(
-                "Something went wrong, and we couldn't log you in. Please reach out to us.",
-                toastSchema("login-failed-1")
-            )
-        }
+    const validateAndSetDomain = (input: string) => {
+        if (!input) return false
+        const strip = input
+            ?.replace(/^(https?:\/\/)?/i, "")
+            .replace(/^www\./i, "")
+            .split("/")[0]
+
+        const domainRegex = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+        if (domainRegex.test(strip)) {
+            setCredentials({ ...credentials, domain: strip })
+            return true
+        } else return false
     }
+
+    async function authenticate(domain: string, password: string) {
+        if (!validateAndSetDomain(domain)) {
+            toast.error("Please enter a valid domain", toastID("invalid-domain"))
+            return
+        }
+        if (attempts >= 5) {
+            toast.error(
+                `Too many failed attempts. Please try again soon.`,
+                toastID("too-many-attempts")
+            )
+            return
+        }
+        setAttempts(attempts + 1)
+        setVerifying(true)
+
+        API(
+            API_ROUTE,
+            "/auth-domain",
+            {
+                domain,
+                password,
+            },
+            (data: any) => {
+                setVerifying(false)
+                setCredentials({
+                    ...credentials,
+                    authenticated: true,
+                    claimed: data.claimed,
+                    timestamp: data.timestamp,
+                })
+            },
+            (error: any) => {
+                console.warn(error)
+                setVerifying(false)
+
+                switch (error.status) {
+                    case 404:
+                        toast.error(
+                            `It looks like Bespoke Web Dev CMS hasn't been setup for ${domain}. Please reach out to us.`,
+                            toastID("domain-not-found")
+                        )
+                        break
+                    default:
+                        toast.error(
+                            "Something went wrong, and we couldn't log you in. Please reach out to us.",
+                            toastID("login-failed")
+                        )
+                }
+            }
+        )
+    }
+
     return (
         <div className={styles.Login}>
             <div className={styles.container}>
@@ -75,10 +110,7 @@ const Login: React.FC<LoginInterface> = ({ credentials, setCredentials }) => {
                 </label>
 
                 <input
-                    onChange={(e: any) => {
-                        const domain = e.target.value.replace(/(^\w+:|^)\/\//, "")
-                        setCredentials({ ...credentials, domain })
-                    }}
+                    onChange={(e: any) => validateAndSetDomain(e.target.value.trim())}
                     type="domain"
                     name="domain"
                     placeholder="example.com"

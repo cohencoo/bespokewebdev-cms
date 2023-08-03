@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react"
 import { toast } from "react-hot-toast"
 import styles from "./Management.module.scss"
-import { API_ROUTE, Credentials, toastSchema } from "../../App"
-import { capitalize, generateSitemap } from "../../assets/utils"
+import { API_ROUTE, Credentials } from "../../App"
+import { API, capitalize, generateSitemap, toastID } from "../../assets/utils"
 
 interface ManagementInterface {
     credentials: Credentials
@@ -20,78 +20,188 @@ const Management: React.FC<ManagementInterface> = ({
     const [loaded, setLoaded] = useState(false)
     const [subpage, setSubpage] = useState("")
     const [sitemap, setSitemap] = useState([]) as any[]
-    const addDomainInput = useRef<HTMLInputElement>(null)
-    const handleIFrameLoad = () => setLoaded(true)
+    const inputs = {
+        domain: useRef<HTMLInputElement>(null),
+        newPassword: useRef<HTMLInputElement>(null),
+        confirmNewPassword: useRef<HTMLInputElement>(null),
+    }
+
+    function changePassword() {
+        openModal(
+            <div style={{ flexDirection: "column" }} className={styles.modal}>
+                <div>
+                    <input
+                        className={styles.modalInput}
+                        type="password"
+                        name="new-password"
+                        maxLength={4}
+                        ref={inputs.newPassword}
+                        style={{ marginBottom: "10px" }}
+                        placeholder="Enter New PIN"
+                    />
+                    <input
+                        className={styles.modalInput}
+                        type="password"
+                        name="confirm-new-password"
+                        maxLength={4}
+                        ref={inputs.confirmNewPassword}
+                        placeholder="Re-Enter New PIN"
+                    />
+                </div>
+                <button
+                    className={styles.modalButton}
+                    onClick={() => {
+                        if (inputs.newPassword.current?.value.trim().length !== 4) {
+                            toast.error(
+                                "Your new PIN must be 4 digits.",
+                                toastID("change-password-error")
+                            )
+                            return
+                        }
+                        if (
+                            inputs.newPassword.current?.value ===
+                            inputs.confirmNewPassword.current?.value
+                        ) {
+                            toast.loading(
+                                `Updating your password...`,
+                                toastID("change-password-loading")
+                            )
+                            API(
+                                API_ROUTE,
+                                "/update-domain-password",
+                                {
+                                    domain: credentials.domain,
+                                    password: credentials.password,
+                                    newPassword: inputs.newPassword.current?.value,
+                                },
+                                () => {
+                                    toast.dismiss("change-password-loading")
+                                    toast.success(
+                                        `Your password has been updated!`,
+                                        toastID("change-password-success")
+                                    )
+                                    setCredentials({
+                                        ...credentials,
+                                        password: inputs.newPassword.current?.value,
+                                    })
+                                    closeModal()
+                                },
+                                () => {
+                                    toast.error(
+                                        `There was an error updating your password. Please try again later.`,
+                                        toastID("change-password-error")
+                                    )
+                                }
+                            )
+                        } else {
+                            toast.error(
+                                "Your new PINs do not match.",
+                                toastID("change-password-error")
+                            )
+                        }
+                    }}>
+                    Update
+                    <span className="material-symbols-rounded">share_windows</span>
+                </button>
+            </div>,
+            "Enter and confirm your new 4-digit password"
+        )
+    }
 
     useEffect(() => {
         generateSitemap(`https://${credentials?.domain}`).then((sitemap) =>
             setSitemap([...new Set(sitemap)])
         )
+
+        if (!credentials.claimed)
+            openModal(
+                <div className={styles.modal}>
+                    <div>
+                        <ul>
+                            <li>
+                                Clicking on text outlined with a{" "}
+                                <span style={{ border: "0.5px dotted red" }}>red border</span> can
+                                be modified as needed. <i>Your edits are automatically saved.</i>
+                            </li>
+                            <li>
+                                For those managing multiple pages, click on the dropdown at the top
+                                center of your screen where you can navigate through subpages.
+                            </li>
+                            <li>
+                                We strongly recommend updating the default password that was
+                                auto-generated for you.
+                            </li>
+                        </ul>
+                        <button onClick={() => changePassword()} className={styles.modalButton}>
+                            <span className="material-symbols-rounded">vpn_key</span>
+                            Change Password
+                        </button>
+                    </div>
+                </div>,
+                `Welcome aboard! Here's a quick tour.`
+            )
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     async function addDomain() {
-        async function addDomainToCMS(domain: string) {
-            try {
-                const response = await fetch(`${API_ROUTE}/add-domain`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ domain }),
-                })
-
-                if (!response.ok) {
-                    if (response.status === 409) {
-                        toast.error(
-                            `${domain} is already setup for CMS.`,
-                            toastSchema("already-in-use")
-                        )
-                    } else {
-                        toast.error("Something went wrong.", toastSchema("domain-failed"))
-                    }
-                    return
-                }
-
-                const data = await response.json()
-                openModal(
-                    <>
-                        <p>
-                            Please ensure Bespoke Web Dev's CMS script is added to {data.domain}'s
-                            website. To login with this domain, please store and use these
-                            credentials.
-                        </p>
-                        <p className={styles.modalData}>
-                            <strong>Domain:</strong> {data.domain}
-                        </p>
-                        <p className={styles.modalData}>
-                            <strong>Client Pin:</strong> {data.password}
-                        </p>
-                    </>,
-                    `${domain} is now registered.`
-                )
-            } catch (error) {
-                toast.error("Something went wrong.", toastSchema("add-failed"))
-            }
-        }
-
         openModal(
             <div className={styles.modal}>
                 <input
                     className={styles.modalInput}
                     type="text"
                     name="domain"
-                    ref={addDomainInput}
+                    ref={inputs.domain}
                     placeholder="example.com"
                 />
                 <button
                     className={styles.modalButton}
                     onClick={() => {
-                        if (addDomainInput.current?.value) {
-                            addDomainToCMS(
-                                addDomainInput.current?.value.replace(/(^\w+:|^)\/\//, "")
+                        if (inputs.domain.current?.value.trim()) {
+                            API(
+                                API_ROUTE,
+                                "/add-domain",
+                                {
+                                    domain: inputs.domain.current?.value.replace(
+                                        /(^\w+:|^)\/\//,
+                                        ""
+                                    ),
+                                },
+                                (data: any) => {
+                                    openModal(
+                                        <>
+                                            <p>
+                                                Please ensure Bespoke Web Dev's CMS script is added
+                                                to {data.domain}'s website. To login with this
+                                                domain, please store and use these credentials.
+                                            </p>
+                                            <p className={styles.modalData}>
+                                                <strong>Domain:</strong> {data.domain}
+                                            </p>
+                                            <p className={styles.modalData}>
+                                                <strong>Client Pin:</strong> {data.password}
+                                            </p>
+                                        </>,
+                                        `${data.domain} is now registered.`
+                                    )
+                                },
+                                (error: any) => {
+                                    if (error.status === 409) {
+                                        toast.error(
+                                            `${inputs.domain.current?.value} is already setup for CMS.`,
+                                            toastID("domain-exists")
+                                        )
+                                    } else {
+                                        toast.error(
+                                            "Something went wrong.",
+                                            toastID("create-failed")
+                                        )
+                                    }
+                                }
                             )
+
                             closeModal()
                         } else {
-                            toast.error("Something went wrong.", toastSchema("create-failed"))
+                            toast.error("Please enter a domain", toastID("domain-empty"))
                         }
                     }}>
                     Submit
@@ -113,7 +223,7 @@ const Management: React.FC<ManagementInterface> = ({
                     <span style={{ fontSize: "2rem" }} className="material-symbols-rounded">
                         domain
                     </span>
-                    Managing {credentials?.domain}
+                    <span className={styles.title}>Managing {credentials?.domain}</span>
                     <span style={{ color: "var(--theme)" }} className="material-symbols-rounded">
                         open_in_new
                     </span>
@@ -172,13 +282,13 @@ const Management: React.FC<ManagementInterface> = ({
                     </div>
                 )}
                 <iframe
-                    onLoad={handleIFrameLoad}
+                    onLoad={() => setLoaded(true)}
                     style={{ display: loaded ? "block" : "none" }}
                     title="editor"
                     src={
                         subpage
-                            ? `${subpage}?q=${credentials?.domain}&token=${credentials?.password}`
-                            : `//${credentials?.domain}?q=${credentials?.domain}&token=${credentials?.password}`
+                            ? `${subpage}?token=${credentials?.password}`
+                            : `https://${credentials?.domain}?token=${credentials?.password}`
                     }></iframe>
             </div>
         </div>

@@ -21,11 +21,13 @@ const SegmentedInput: React.FC<SegmentedInputInterface> = ({
     useEffect(() => {
         if (input.length === maxLength && onFilled) {
             onFilled()
-            setInput("")
-            if (inputRef.current) {
-                inputRef.current.focus()
-                inputRef.current.value = ""
-            }
+            setTimeout(() => {
+                setInput("")
+                if (inputRef.current) {
+                    inputRef.current.focus()
+                    setHighlightFirst(false)
+                }
+            }, 400)
         }
     }, [input, maxLength, onFilled])
 
@@ -40,6 +42,7 @@ const SegmentedInput: React.FC<SegmentedInputInterface> = ({
                 type="text"
                 ref={inputRef}
                 maxLength={maxLength}
+                value={input}
                 onChange={(e: any) => {
                     onChange(e.target.value)
                     setInput(e.target.value)
@@ -55,7 +58,7 @@ const SegmentedInput: React.FC<SegmentedInputInterface> = ({
                         style={{
                             background:
                                 (highlightFirst && i === 0) || i < input.length
-                                    ? "rgba(255, 255, 255, 0.08)"
+                                    ? "rgba(255, 255, 255, 0.06)"
                                     : undefined,
                         }}>
                         {secret && input[i] ? "•" : input[i]}

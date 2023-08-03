@@ -5,26 +5,12 @@ import { Toaster } from "react-hot-toast"
 import Modal from "./components/Modal/Modal"
 
 export const API_ROUTE = "https://visioneerlist.herokuapp.com/bwd"
-export const toastStyles: any = {
-    borderRadius: "10px",
-    background: "#eee",
-    color: "#000",
-    boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
-    pointerEvents: "none",
-}
-
-export const toastSchema = (id: string): any => {
-    return {
-        id: id,
-        duration: 4000,
-        position: "top-right",
-        style: toastStyles,
-    }
-}
 export interface Credentials {
     domain: string
     password: string
     authenticated: boolean
+    claimed: boolean
+    timestamp?: number
 }
 
 function App() {
