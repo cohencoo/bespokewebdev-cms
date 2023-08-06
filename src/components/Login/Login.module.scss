@@ -2,7 +2,7 @@
     color: white;
     height: 100vh;
     background: black;
-    overflow-x: hidden;
+    overflow-y: scroll;
     background-image: radial-gradient(
             circle at 40% 20%,
             rgba(255, 140, 245, 0.03) 20%,
@@ -18,7 +18,7 @@
         transform: translate(-50%, -50%);
         background-color: rgba(60, 60, 60, 0.2);
         text-align: left;
-        padding: 2rem 2rem 1.5rem 2rem;
+        padding: 2rem;
         border-radius: 1rem;
         max-width: 600px;
 
@@ -96,7 +96,7 @@
             font-size: 1rem;
             width: 100%;
             padding: 10px;
-            margin: 12px 0 2rem 0;
+            margin: 12px 0 1rem 0;
             border: none;
             border-radius: 5px;
             background-color: rgba(255, 255, 255, 0.04);
@@ -113,10 +113,18 @@
             background-color: rgba(255, 255, 255, 0.05);
         }
 
-        a {
-            color: var(--theme);
-            font-size: 1rem;
-            font-weight: 500;
+        .org {
+            display: flex;
+            gap: 1rem;
+            color: (--subtext);
+            border-radius: 8px;
+            margin-top: 3rem;
+            margin-bottom: -1rem;
+            align-items: center;
+
+            span {
+                font-size: 1.8rem;
+            }
         }
     }
 }

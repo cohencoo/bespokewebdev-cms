@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { toast } from "react-hot-toast"
 import styles from "./Management.module.scss"
 import { API_ROUTE, Credentials } from "../../App"
-import { API, capitalize, generateSitemap, toastID } from "../../assets/utils"
+import { API, capitalize, generateSitemap, toastID } from "../assets/utils"
 
 interface ManagementInterface {
     credentials: Credentials
