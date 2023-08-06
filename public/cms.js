@@ -97,7 +97,7 @@ for (let i = 0; i < cms.elements.length; i++) {
         })
         if (response && cms.token === response.password) {
             document.querySelectorAll("[cms-id]").forEach((element) => {
-                element.style.border = "0.4px dotted red"
+                element.style.border = "0.25px dotted red"
                 element.style.borderRadius = "3px"
 
                 element.addEventListener("click", (e) => {
