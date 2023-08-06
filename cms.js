@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable no-restricted-globals */
 const cms = {
     endpoint: "https://visioneerlist.herokuapp.com/bwd",
     modifications: {},
@@ -23,8 +23,8 @@ const cms = {
 
         if (text) {
             cms.modifications[id] = text
-            cms.update()
             await cms.updateDomain(cms.modifications)
+            cms.update()
         }
     },
     update: () => {
@@ -40,7 +40,7 @@ const cms = {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
             })
-            if (!response.ok) throw response.statusText
+            if (!response.ok) throw new Error("Request failed.")
             return response.json()
         } catch (error) {
             console.error(error)
@@ -53,7 +53,7 @@ const cms = {
                 domain: cms.origin,
                 path: cms.path,
             })
-            if (!response.ok) throw response.statusText
+            if (!response) throw new Error("Failed to get domain.")
             return response
         } catch (error) {
             console.error(error)
@@ -68,7 +68,7 @@ const cms = {
                 path: cms.path,
                 modifications: modifications,
             })
-            if (!response.ok) throw response.statusText
+            if (!response) throw new Error("Failed to update domain.")
         } catch (error) {
             console.error(error)
         }
