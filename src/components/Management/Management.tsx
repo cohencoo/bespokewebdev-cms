@@ -43,7 +43,7 @@ const Management: React.FC<ManagementInterface> = ({
                     type="text"
                     name="author"
                     ref={inputs.author}
-                    placeholder="Author"
+                    placeholder="Name of Author"
                 />
                 <button
                     className={styles.modalButton}
@@ -68,10 +68,15 @@ const Management: React.FC<ManagementInterface> = ({
                                     },
                                 },
                                 () =>
-                                    toast.success("Quote has been added!", toastID("added-quote")),
+                                    toast.success(
+                                        "Quote has been added! Click on your website in the top left corner to see updates.",
+                                        toastID("added-quote")
+                                    ),
                                 () => toast.error("Something went wrong.", toastID("failed-quote"))
                             )
 
+                            inputs.quote.current!.value = ""
+                            inputs.author.current!.value = ""
                             closeModal()
                         } else {
                             toast.error("Please enter a quote to add", toastID("quote-empty"))
@@ -81,7 +86,7 @@ const Management: React.FC<ManagementInterface> = ({
                     <span className="material-symbols-rounded">share_windows</span>
                 </button>
             </div>,
-            "Enter a Quote to add"
+            "Enter new Quote"
         )
     }
 
