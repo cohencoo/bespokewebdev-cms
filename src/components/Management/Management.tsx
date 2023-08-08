@@ -24,6 +24,65 @@ const Management: React.FC<ManagementInterface> = ({
         domain: useRef<HTMLInputElement>(null),
         newPassword: useRef<HTMLInputElement>(null),
         confirmNewPassword: useRef<HTMLInputElement>(null),
+        quote: useRef<HTMLInputElement>(null),
+        author: useRef<HTMLInputElement>(null),
+    }
+
+    async function addTestimonials() {
+        openModal(
+            <div style={{ flexDirection: "column" }} className={styles.modal}>
+                <input
+                    className={styles.modalInput}
+                    type="text"
+                    name="quote"
+                    ref={inputs.quote}
+                    placeholder="Quote"
+                />
+                <input
+                    className={styles.modalInput}
+                    type="text"
+                    name="author"
+                    ref={inputs.author}
+                    placeholder="Author"
+                />
+                <button
+                    className={styles.modalButton}
+                    onClick={() => {
+                        if (
+                            inputs.quote.current?.value.trim() &&
+                            inputs.author.current?.value.trim()
+                        ) {
+                            API(
+                                API_ROUTE,
+                                "/update-domain",
+                                {
+                                    domain: credentials.domain,
+                                    password: credentials.password,
+                                    path: "/",
+                                    modifications: {},
+                                    addToDynamic: {
+                                        ["carousel-" + Date.now().toString()]: [
+                                            inputs.quote.current?.value,
+                                            inputs.author.current?.value,
+                                        ],
+                                    },
+                                },
+                                () =>
+                                    toast.success("Quote has been added!", toastID("added-quote")),
+                                () => toast.error("Something went wrong.", toastID("failed-quote"))
+                            )
+
+                            closeModal()
+                        } else {
+                            toast.error("Please enter a quote to add", toastID("quote-empty"))
+                        }
+                    }}>
+                    Submit
+                    <span className="material-symbols-rounded">share_windows</span>
+                </button>
+            </div>,
+            "Enter a Quote to add"
+        )
     }
 
     function changePassword() {
@@ -258,6 +317,13 @@ const Management: React.FC<ManagementInterface> = ({
                     {credentials?.domain === "bespokewebdev.com" && (
                         <button className={styles.button} onClick={() => addDomain()}>
                             Add Domain to CMS
+                            <span className="material-symbols-rounded">add</span>
+                        </button>
+                    )}
+
+                    {credentials?.domain === "cleoscandles.com" && (
+                        <button className={styles.button} onClick={() => addTestimonials()}>
+                            Add Quotes
                             <span className="material-symbols-rounded">add</span>
                         </button>
                     )}
