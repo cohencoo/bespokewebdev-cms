@@ -23,7 +23,7 @@ const cms = {
 
         if (text) {
             cms.modifications[id] = text
-            await cms.updateDomain({ id: text })
+            await cms.updateDomain({ [id]: text })
             cms.update()
         }
     },
