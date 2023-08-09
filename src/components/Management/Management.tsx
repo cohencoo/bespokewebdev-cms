@@ -207,75 +207,6 @@ const Management: React.FC<ManagementInterface> = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    async function addDomain() {
-        openModal(
-            <div className={styles.modal}>
-                <input
-                    className={styles.modalInput}
-                    type="text"
-                    name="domain"
-                    ref={inputs.domain}
-                    placeholder="example.com"
-                />
-                <button
-                    className={styles.modalButton}
-                    onClick={() => {
-                        if (inputs.domain.current?.value.trim()) {
-                            API(
-                                API_ROUTE,
-                                "/add-domain",
-                                {
-                                    domain: inputs.domain.current?.value.replace(
-                                        /(^\w+:|^)\/\//,
-                                        ""
-                                    ),
-                                },
-                                (data: any) => {
-                                    openModal(
-                                        <>
-                                            <p>
-                                                Please ensure Bespoke Web Dev's CMS script is added
-                                                to {data.domain}'s website. To login with this
-                                                domain, please store and use these credentials.
-                                            </p>
-                                            <p className={styles.modalData}>
-                                                <strong>Domain:</strong> {data.domain}
-                                            </p>
-                                            <p className={styles.modalData}>
-                                                <strong>Client Pin:</strong> {data.password}
-                                            </p>
-                                        </>,
-                                        `${data.domain} is now registered.`
-                                    )
-                                },
-                                (error: any) => {
-                                    if (error.status === 409) {
-                                        toast.error(
-                                            `${inputs.domain.current?.value} is already setup for CMS.`,
-                                            toastID("domain-exists")
-                                        )
-                                    } else {
-                                        toast.error(
-                                            "Something went wrong.",
-                                            toastID("create-failed")
-                                        )
-                                    }
-                                }
-                            )
-
-                            closeModal()
-                        } else {
-                            toast.error("Please enter a domain", toastID("domain-empty"))
-                        }
-                    }}>
-                    Submit
-                    <span className="material-symbols-rounded">share_windows</span>
-                </button>
-            </div>,
-            "Enter domain origin"
-        )
-    }
-
     return (
         <div className={styles.Management}>
             <div className={styles.header}>
@@ -320,7 +251,9 @@ const Management: React.FC<ManagementInterface> = ({
 
                 <div className={styles.toolbar}>
                     {credentials?.domain === "bespokewebdev.com" && (
-                        <button className={styles.button} onClick={() => addDomain()}>
+                        <button
+                            className={styles.button}
+                            onClick={() => (window.location.href = "?proceed=ready")}>
                             Add Domain to CMS
                             <span className="material-symbols-rounded">add</span>
                         </button>

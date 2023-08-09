@@ -3,6 +3,7 @@ import Management from "./components/Management/Management"
 import Login from "./components/Login/Login"
 import { Toaster } from "react-hot-toast"
 import Modal from "./components/Modal/Modal"
+import Register from "./components/Register/Register"
 
 export const API_ROUTE = "https://visioneerlist.herokuapp.com/bwd"
 export interface Credentials {
@@ -41,6 +42,12 @@ function App() {
                     closeModal={closeModal}
                     credentials={credentials}
                     setCredentials={setCredentials}
+                />
+            ) : new URLSearchParams(window.location.search).get("proceed") ? (
+                <Register
+                    setCredentials={setCredentials}
+                    openModal={openModal}
+                    closeModal={closeModal}
                 />
             ) : (
                 <Login credentials={credentials} setCredentials={setCredentials} />
