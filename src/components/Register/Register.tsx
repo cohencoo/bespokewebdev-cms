@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useRef, useState } from "react"
 import styles from "./Register.module.scss"
 import logo from "../assets/logo.svg"
 import { API_ROUTE } from "../../App"
@@ -6,11 +6,13 @@ import { API, toastID } from "../assets/utils"
 import toast from "react-hot-toast"
 import Button from "../Button/Button"
 
-const Register: React.FC<{ setCredentials: any; closeModal: any; openModal: any }> = ({
-    setCredentials,
-    closeModal,
-    openModal,
-}) => {
+interface RegisterInterface {
+    setCredentials: any
+    closeModal: any
+    openModal: any
+}
+
+const Register: React.FC<RegisterInterface> = ({ setCredentials, closeModal, openModal }) => {
     const [verifying, setVerifying] = useState<boolean>(false)
     const domainRef = useRef<HTMLInputElement>(null)
 
@@ -22,15 +24,14 @@ const Register: React.FC<{ setCredentials: any; closeModal: any; openModal: any 
             .split("/")[0]
 
         const domainRegex = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-        if (domainRegex.test(strip)) return true
-        else return false
+        if (domainRegex.test(strip)) {
+            if (domainRef.current) domainRef.current.value = strip
+            return true
+        } else return false
     }
 
-    useEffect(() => {
-        toast.success("You're all set. Thanks for your order!", toastID("awesome"))
-    }, [])
-
     async function addDomain() {
+        setVerifying(true)
         if (domainRef.current?.value.trim() && validateAndSetDomain(domainRef.current?.value)) {
             API(
                 API_ROUTE,
@@ -39,7 +40,7 @@ const Register: React.FC<{ setCredentials: any; closeModal: any; openModal: any 
                     domain: domainRef.current?.value.replace(/(^\w+:|^)\/\//, ""),
                 },
                 (data: any) => {
-                    setVerifying(true)
+                    setVerifying(false)
                     openModal(
                         <>
                             <p>
@@ -94,14 +95,15 @@ const Register: React.FC<{ setCredentials: any; closeModal: any; openModal: any 
             <div className={styles.container}>
                 <div className={styles.flex}>
                     <img src={logo} className={styles.logo} alt="BWD" />
-                    <div>
-                        <h1>Add your domain</h1>
-                    </div>
+                    <span className="material-symbols-rounded">conversion_path</span>
+                    <span className="material-symbols-rounded">preliminary</span>
                 </div>
 
+                <h1>Add your domain</h1>
+
                 <p className={styles.text}>
-                    Almost There! –– Please enter your domain (eg. example.com), so you can manage
-                    it's content.
+                    Almost There! –– Please enter your domain (eg. example.com), so you can start
+                    managing content on your website.
                 </p>
 
                 <label htmlFor="domain">
@@ -115,10 +117,7 @@ const Register: React.FC<{ setCredentials: any; closeModal: any; openModal: any 
                     message={["Add Domain", "Verifying..."]}
                     icon={"share_windows"}
                     verifying={verifying}
-                    action={() => {
-                        setVerifying(true)
-                        addDomain()
-                    }}
+                    action={() => addDomain()}
                 />
             </div>
         </div>

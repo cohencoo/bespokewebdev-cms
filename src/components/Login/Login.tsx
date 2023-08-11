@@ -97,9 +97,10 @@ const Login: React.FC<LoginInterface> = ({ credentials, setCredentials }) => {
                 </div>
 
                 {page === 1 && (
-                    <div className={styles.org}>
+                    <div onClick={() => setPage(0)} className={styles.org}>
                         <span className="material-symbols-rounded">language</span>
                         {credentials?.domain}
+                        <div className="material-symbols-rounded">undo</div>
                     </div>
                 )}
 

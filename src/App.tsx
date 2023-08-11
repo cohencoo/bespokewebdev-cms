@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import Management from "./components/Management/Management"
 import Login from "./components/Login/Login"
 import { Toaster } from "react-hot-toast"
@@ -26,6 +26,11 @@ function App() {
         setShowModal(true)
         title && setModalTitle(title)
     }
+
+    useEffect(() => {
+        if (new URLSearchParams(window.location.search).get("proceed"))
+            window.history.replaceState({}, document.title, window.location.pathname)
+    })
 
     return (
         <>

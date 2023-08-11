@@ -4,9 +4,21 @@ const cms = {
     modifications: {},
     origin: location.hostname,
     path: location.pathname,
-    token: new URL(window.location.href).searchParams.get("token"),
     count: 1,
     elements: document.body.getElementsByTagName("*"),
+    getToken: () => {
+        const decrypt = (encoded) => {
+            const textToChars = (text) => text.split("").map((c) => c.charCodeAt(0))
+            const applySaltToChar = (code) => textToChars("salt").reduce((a, b) => a ^ b, code)
+            return encoded
+                .match(/.{1,2}/g)
+                .map((hex) => parseInt(hex, 16))
+                .map(applySaltToChar)
+                .map((charCode) => String.fromCharCode(charCode))
+                .join("")
+        }
+        return decrypt(new URL(window.location.href).searchParams.get("token"))
+    },
     textNode: (element) => {
         for (let i = 0; i < element.childNodes.length; i++) {
             let child = element.childNodes[i]
@@ -40,10 +52,9 @@ const cms = {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
             })
-            if (!response.ok) throw new Error("Request failed.")
+            if (!response.ok) console.warn(response.statusText)
             return response.json()
         } catch (error) {
-            console.error(error)
             return null
         }
     },
@@ -53,10 +64,9 @@ const cms = {
                 domain: cms.origin,
                 path: cms.path,
             })
-            if (!response) throw new Error("Failed to get domain.")
+            if (!response.ok) console.warn(response.statusText)
             return response
         } catch (error) {
-            console.error(error)
             return null
         }
     },
@@ -64,14 +74,12 @@ const cms = {
         try {
             const response = await cms.fetch("/update-domain", {
                 domain: cms.origin,
-                password: cms.token,
+                password: cms.getToken(),
                 path: cms.path,
                 modifications: modifications,
             })
-            if (!response) throw new Error("Failed to update domain.")
-        } catch (error) {
-            console.error(error)
-        }
+            if (!response.ok) console.warn(response.statusText)
+        } catch (error) {}
     },
 }
 
@@ -90,12 +98,12 @@ for (let i = 0; i < cms.elements.length; i++) {
         cms.update()
     }
 
-    if (cms.origin && cms.token) {
+    if (cms.origin && cms.getToken()) {
         const response = await cms.fetch("/auth-domain", {
             domain: cms.origin,
-            password: cms.token,
+            password: cms.getToken(),
         })
-        if (response && cms.token === response.password) {
+        if (response && cms.getToken() === response.password) {
             document.querySelectorAll("[cms-id]").forEach((element) => {
                 element.style.border = "0.25px dotted red"
                 element.style.borderRadius = "3px"
