@@ -61,9 +61,7 @@ const cms = {
                     .join("")
             }
             return decrypt(new URL(window.location.href).searchParams.get("token"))
-        } catch (err) {
-            console.log("CMS not active")
-        }
+        } catch (err) {}
     },
     textNode: (element) => {
         for (let i = 0; i < element.childNodes.length; i++) {
@@ -74,11 +72,9 @@ const cms = {
     },
     handleElementClick: async (element) => {
         const id = element.getAttribute("cms-id")
+        const isMobile = window.innerWidth < 768 ? true : false
 
-        const mobileOrNot = window.innerWidth < 768 ? true : false
-
-        //
-        const text = mobileOrNot
+        const text = isMobile
             ? prompt("Editing this text", document.querySelector(`[cms-id="${id}"]`).innerText)
             : await cms.getInput(
                   "Editing this text",
@@ -156,7 +152,7 @@ for (let i = 0; i < cms.elements.length; i++) {
             password: cms.getToken(),
         })
         if (response && cms.getToken() === response.password) {
-            console.log(data)
+            console.table(data)
             document.querySelectorAll("[cms-id]").forEach((element) => {
                 element.style.border = "0.25px dotted red"
                 element.style.borderRadius = "3px"
