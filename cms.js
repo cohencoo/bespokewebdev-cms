@@ -7,14 +7,15 @@ const cms = {
     count: 1,
     elements: document.body.getElementsByTagName("*"),
     getInput: async function (label, content) {
-        const btn = `width: 100%;padding: 10px;border-radius: 8px;border: 1px solid #ccc;cursor: pointer;font-size: 16px;font-family: inherit;`
+        const btn =
+            "width: 100%;padding: 10px;border-radius: 8px;border: 1px solid #ccc;cursor: pointer;font-size: 16px;font-family: inherit;"
         const backdrop = document.createElement("div")
         backdrop.style =
-            "position: fixed;top: 0;left: 0;z-index: 99999;width: 100vw;height: 100vh;background: rgba(0, 0, 0, 0.5);webkit-backdrop-filter: blur(5px);backdrop-filter: blur(5px);"
+            "position: fixed;top: 0;left: 0;z-index: 99999;width: 100vw;height: 100vh;background: rgba(0, 0, 0, 0.5);webkit-backdrop-filter: blur(5px);backdrop-filter: blur(5px);opacity:0;transition:0.4s;"
 
         const modal = document.createElement("div")
         modal.style =
-            "position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);background: white;padding: 16px;border-radius: 8px;width: 100%;max-width: 500px;"
+            "position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);background: white;padding: 16px;border-radius: 8px;width: 100%;max-width: 500px;color:black;"
 
         const input = document.createElement("textarea")
         input.placeholder = content
@@ -25,13 +26,15 @@ const cms = {
 
         const save = document.createElement("button")
         save.type = "submit"
-        save.innerText = "Update text"
-        save.style = btn + "background: #0066ff; color: white; font-weight: 600;"
+        save.innerText = "Save changes"
+        save.style =
+            btn + "background: #0066ff !important; color: white !important; font-weight: 600;"
 
         const close = document.createElement("button")
         close.type = "button"
         close.innerText = "Cancel changes"
-        close.style = btn + "margin-top: 10px; background: #ggg;"
+        close.style =
+            btn + "margin-top: 10px; background: #ggg !important; color: black !important;"
 
         modal.innerText = label
         modal.appendChild(input)
@@ -40,6 +43,7 @@ const cms = {
         backdrop.appendChild(modal)
         document.body.appendChild(backdrop)
         close.addEventListener("click", () => backdrop.remove())
+        backdrop.style.opacity = 1
 
         return new Promise((resolve) => {
             save.addEventListener("click", () => {
