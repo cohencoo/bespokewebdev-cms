@@ -77,13 +77,11 @@ const cms = {
     handleElementClick: async (element) => {
         const id = element.getAttribute("cms-id")
         const isMobile = window.innerWidth < 768 ? true : false
+        const block = document.querySelector(`[cms-id="${id}"]`).innerText
 
         const text = isMobile
-            ? prompt("Editing this text", document.querySelector(`[cms-id="${id}"]`).innerText)
-            : await cms.getInput(
-                  "Editing this text",
-                  document.querySelector(`[cms-id="${id}"]`).innerText
-              )
+            ? prompt("Editing this text", block)
+            : await cms.getInput(`Editing "${block.slice(0, 25)}..."`, block)
 
         if (text) {
             cms.modifications[id] = text
