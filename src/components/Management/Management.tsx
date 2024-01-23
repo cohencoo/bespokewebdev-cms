@@ -3,7 +3,6 @@ import styles from "./Management.module.scss"
 import { Credentials } from "../../App"
 import { capitalize, encrypt, generateSitemap } from "../assets/utils"
 import { changePassword } from "./helpers/changePassword"
-import { addTestimonials } from "./helpers/addTestimonials"
 
 interface ManagementInterface {
     credentials: Credentials
@@ -133,23 +132,6 @@ const Management: React.FC<ManagementInterface> = ({
                                 )
                             }>
                             Add Domain to CMS
-                            <span className="material-symbols-rounded">add</span>
-                        </button>
-                    )}
-
-                    {credentials?.domain === "cleoscandles.com" && (
-                        <button
-                            className={styles.button}
-                            onClick={() =>
-                                addTestimonials({
-                                    inputs,
-                                    credentials,
-                                    setCredentials,
-                                    openModal,
-                                    closeModal,
-                                })
-                            }>
-                            Add Quotes
                             <span className="material-symbols-rounded">add</span>
                         </button>
                     )}

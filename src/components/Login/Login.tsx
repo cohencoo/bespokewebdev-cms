@@ -29,6 +29,7 @@ const Login: React.FC<LoginInterface> = ({ credentials, setCredentials }) => {
             ?.replace(/^(https?:\/\/)?/i, "")
             .replace(/^www\./i, "")
             .split("/")[0]
+            .toLocaleLowerCase()
 
         const domainRegex = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
         if (domainRegex.test(strip)) {
